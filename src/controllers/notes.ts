@@ -74,7 +74,7 @@ export default class NotesController {
                 user_id
             });
 
-            await cacheRepository.delete(`notes:${parseInt(id)}`);
+            await cacheRepository.delete(`notes:${user_id}:${parseInt(id)}`);
 
             return response.status(httpSuccessCode).json(actionMessage('Nota editada')), users;
         } catch(error) {
@@ -90,7 +90,7 @@ export default class NotesController {
 
         try {
             await service.delete(parseInt(id));
-            await cacheRepository.delete(`users:${userId}`);
+            await cacheRepository.delete(`users:${userId}:${parseInt(id)}`);
 
             return response.status(httpNoContentCode).json(actionMessage('Nota deletada'));
         } catch(error) {
