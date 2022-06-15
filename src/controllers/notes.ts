@@ -16,25 +16,24 @@ export default class NotesController {
         const { userId } = request.params;
         const notesService = new NotesService();
         const cacheRepository = new CacheRepository();
-
+        
         try {
-            const setCache = await cacheRepository.index(`notes:${userId}`);
-
-            if (setCache) {
-                return response.json(setCache);
-            }
-
             const notes = await notesService.find();
             const noteAuth = notes?.filter(note => note.user_id === parseInt(userId));
+            const cache = await cacheRepository.get(`notes:${userId}`);
             const notesCache = noteAuth.map(note => {
                 return {
-                id: note.id,
-                note: note.note,
-                user_id: note.user_id
+                    id: note.id,
+                    note: note.note,
+                    user_id: note.user_id
                 }
             });
+
+            if (cache) {
+                return response.status(201).json(cache);
+            }
     
-            await cacheRepository.save(`notes:${userId}`, notesCache);
+            await cacheRepository.set(`notes:${userId}`, notesCache);
 
             return response.json(notesCache);
         } catch(error) {
@@ -53,7 +52,7 @@ export default class NotesController {
                 user_id: user_id
             });
 
-            await cacheRepository.delete(`notes:${user_id}`);
+            await cacheRepository.del(`notes:${user_id}`);
 
             return response.status(httpCreatedCode).json(actionMessage('Nota criada'));
         } catch(error) {
@@ -74,8 +73,8 @@ export default class NotesController {
                 user_id
             });
 
-            await cacheRepository.delete(`notes:${user_id}:${parseInt(id)}`);
-
+            await cacheRepository.del(`notes:${user_id}`);
+            
             return response.status(httpSuccessCode).json(actionMessage('Nota editada')), users;
         } catch(error) {
             throw new HttpError(defaultErrorMessage, httpInternalErrorCode);
@@ -83,14 +82,13 @@ export default class NotesController {
     }
 
     async delete(request: Request, response: Response) {
-        const { id } = request.params;
-        const { userId } = request.body;
+        const { id, userId } = request.params;
         const service = new NotesService;
         const cacheRepository = new CacheRepository();
 
         try {
             await service.delete(parseInt(id));
-            await cacheRepository.delete(`users:${userId}:${parseInt(id)}`);
+            await cacheRepository.del(`notes:${userId}`);
 
             return response.status(httpNoContentCode).json(actionMessage('Nota deletada'));
         } catch(error) {

@@ -8,21 +8,21 @@ export class CacheRepository {
         this.redis = Redis.getInstance();
     }
 
-    async save(key: string, value: any) {
+    async set(key: string, value: any) {
         return await this.redis.set(key, JSON.stringify(value));
     }
 
-    async saveEx(key: string, value: any, ttl: number) {
+    async setEx(key: string, value: any, ttl: number) {
         return await this.redis.set(key, JSON.stringify(value), 'EX', ttl);
     }
 
-    async index(key: string) {
+    async get(key: string) {
         const value = await this.redis.get(key);
 
         return value ? JSON.parse(value) : null;
     }
 
-    async delete(key: string) {
+    async del(key: string) {
         const result = await this.redis.del(key);
 
         return result !== 0;
