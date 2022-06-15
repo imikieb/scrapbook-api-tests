@@ -29,12 +29,10 @@ export default class NotesController {
                 }
             });
 
-            if (cache) {
-                return response.status(201).json(cache);
-            }
+            if (cache) return response.status(201).json(cache);
     
-            await cacheRepository.set(`notes:${userId}`, notesCache);
-
+            await cacheRepository.setEx(`notes:${userId}`, notesCache, 60 * 24);
+            
             return response.json(notesCache);
         } catch(error) {
             throw new HttpError(defaultErrorMessage, httpInternalErrorCode);
