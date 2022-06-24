@@ -1,4 +1,6 @@
 /node_modules/
 .env
+/coverage
+/db-test.sql
 yarn-error.log
 yarn.lock
