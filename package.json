@@ -31,6 +31,14 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "build": "tsc",
     "start": "node ./dist/server",
-    "migration:run": "ts-node-dev --transpile-only ./node_modules/typeorm/cli.js migration:run"
+    "migration:run": "ts-node-dev --transpile-only ./node_modules/typeorm/cli.js migration:run",
+    "migration:revert": "ts-node-dev --transpile-only ./node_modules/typeorm/cli.js migration:revert",
+    "migration:test": "cross-env NODE_ENV=test && yarn migration:run",
+    "test:setup": "rimraf ./db-test.sql && yarn migration:test",
+    "test": "cross-env NODE_ENV=test && yarn test:setup && jest --passWithNoTests --silent --noStackTrace --runInBand",
+    "test:verbose": "cross-env NODE_ENV=test && yarn test:setup && jest --passWithNoTests --runInBand --detectOpenHandles",
+    "test:coverage": "test --coverage",
+    "test:unit": "tests --watchAll -c ./jest-unit.config.ts",
+    "test:integration": "tests --watchAll -c ./jest-integration.config.ts"
   }
 }
